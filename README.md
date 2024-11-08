@@ -3,6 +3,8 @@ DirectoryBruteforce is a simple yet effective Python-based tool designed to perf
 `git clone https://github.com/prakash-js/BruteWebPaths.git`
 
 `cd BruteWebPaths`
+
 `pip install -r requirement.txt`
+
 `python3 brutewebpaths.py`
 
