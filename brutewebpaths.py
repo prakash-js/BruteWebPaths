@@ -55,7 +55,7 @@ class DirectoryBruteforce:
 
     def attack(self, fuzz):
 
-        adding = str(self.url + '/' + fuzz.strip())
+        adding = str(self.url + fuzz.strip())
         requesting = requests.get(adding)
         try:
             if requesting.status_code == 200:
