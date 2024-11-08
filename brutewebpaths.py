@@ -87,8 +87,6 @@ class DirectoryBruteforce:
         except ConnectionError as e:
             print(f"connection error {e}")
 
-    import time
-
     def trail(self):
         while True:  
             self.user_choice = input("Enter a choice (exit/extend): ").strip().lower() 
