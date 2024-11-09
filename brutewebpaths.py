@@ -45,7 +45,7 @@ class DirectoryBruteforce:
             try:
                 self.Thread_count = int(input("Enter the Number of Thread Count (between 0 - 9): "))
                 if (self.Thread_count >= 0 and self.Thread_count <= 9):
-                    break 
+                    break  
                 else:
                     print("Invalid Thread Count, it must be between 0 and 9.")
 
@@ -54,7 +54,7 @@ class DirectoryBruteforce:
 
     def attack(self, fuzz):
 
-        adding = str(self.url + fuzz.strip())
+        adding = str(self.url + '/' + fuzz.strip())
         requesting = requests.get(adding)
         try:
             if requesting.status_code == 200:
@@ -84,6 +84,8 @@ class DirectoryBruteforce:
 
         except ConnectionError as e:
             print(f"connection error {e}")
+
+    import time
 
     def trail(self):
         while True:  
