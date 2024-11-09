@@ -44,9 +44,8 @@ class DirectoryBruteforce:
         while True:
             try:
                 self.Thread_count = int(input("Enter the Number of Thread Count (between 0 - 9): "))
-                # Check if Thread_count is within the valid range
                 if (self.Thread_count >= 0 and self.Thread_count <= 9):
-                    break  # Exit the loop if input is valid
+                    break 
                 else:
                     print("Invalid Thread Count, it must be between 0 and 9.")
 
@@ -62,7 +61,6 @@ class DirectoryBruteforce:
                 print(adding)
                 with open(f"200_{self.projectname}{1}.txt", "a") as file:
                     file.write(adding + "\n")
-                    print(adding)
             elif requesting.status_code == 403:
                 print(adding)
                 with open(f"403_{self.projectname}.txt", "a") as file:
