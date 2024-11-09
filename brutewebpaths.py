@@ -105,7 +105,6 @@ class DirectoryBruteforce:
                 print("Invalid option. Select from the options: 'exit' or 'extend'.")
 
     def Thread(self):
-#        self.Thread_count = int(input("Enter the thread count (between 0 and 9): "))
         with open(self.wordlist, 'r') as f:
             with ThreadPoolExecutor(max_workers=self.Thread_count) as executor:
                 executor.map(self.attack, f)
