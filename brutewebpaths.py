@@ -131,18 +131,20 @@ class DirectoryBruteforce:
                 except requests.exceptions.RequestException as e:
                     pass
 
-            
-
 
     def Thread2(self):
-        with open(self.wordlist, 'r') as f:
-            with ThreadPoolExecutor(max_workers=self.Thread_count) as executor:
-                executor.map(lambda fuzz: self.layer2(fuzz, self.n), f)
+        x = self.n
 
-    def Thread3(self):
-        with open(self.wordlist, 'r') as f:
-            with ThreadPoolExecutor(max_workers=self.Thread_count) as executor:
-                executor.map(lambda fuzz: self.layer2(fuzz, self.n + 1), f)
+        while True:
+            with open(f"200_{self.projectname}{self.n}.txt", 'r') as file:
+                y = file.read()
+                if not y:
+                    break
+            with open(self.wordlist, 'r') as f:
+                with ThreadPoolExecutor(max_workers=self.Thread_count) as executor:
+                    executor.map(lambda fuzz: self.layer2(fuzz,  x), f)
+            x += 1
+            self.n = x
 
 dictionary = DirectoryBruteforce()
 dictionary.url_validations()
@@ -150,4 +152,3 @@ dictionary.validating_wordlist()
 dictionary.Thread_Count_func()
 dictionary.Thread()
 dictionary.Thread2()
-dictionary.Thread3()
