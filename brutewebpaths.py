@@ -16,6 +16,8 @@ class DirectoryBruteforce:
     def url_validations(self):
         while True:
             self.url = str(input("Enter the url to fuzz : "))
+            if self.url[-1] != "/":
+                self.url += '/'
 
             try:
                 response = requests.get(self.url)
