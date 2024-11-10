@@ -15,7 +15,6 @@ class DirectoryBruteforce:
         self.seconds = None
         self.n = 1
 
-
     def url_validations(self):
         while True:
             self.url = str(input("Enter the url to fuzz : "))
@@ -60,7 +59,7 @@ class DirectoryBruteforce:
     def attack(self, fuzz):
 
         adding = str(self.url + fuzz.strip())
-        requesting = requests.get(adding, timeout=8)
+        requesting = requests.get(adding, timeout=8, allow_redirects=False)
         try:
             if requesting.status_code == 200:
                 print(adding)
@@ -72,46 +71,19 @@ class DirectoryBruteforce:
                     file.write(adding + "\n")
             elif requesting.status_code == 403:
                 print(adding)
-                with open(f"403_{self.projectname}.txt", "a") as file:
+                with open(f"403_{self.projectname}{self.m}.txt", "a") as file:
                     file.write(adding + "\n")
             elif requesting.status_code == 500:
                 print(adding)
                 with open(f"500_{self.projectname}.txt", "a") as file:
                     file.write(adding + "\n")
             elif requesting.status_code == 429:
-                print("Error 429: Too many requests have been made in a short period of time \n(sleeping for 60sec.")
-                time.sleep(60)
-                if requesting.status_code == 429:
-                    print("The Server Not yet cool down")
-                    print("Do you want to 'exit' or 'extend' the time to sleep for further attack")
-                    DirectoryBruteforce.trail(self)
-                else:
-                    pass
+                print("Error 429: Too many requests have been made in a short period of time \n(sleeping for 600Sec.")
+                time.sleep(600)
             else:
                 pass
-
-
         except ConnectionError as e:
             print(f"connection error {e}")
-
-    import time
-
-    def trail(self):
-        while True:
-            self.user_choice = input("Enter a choice (exit/extend): ").strip().lower()
-            if self.user_choice == 'exit':
-                print("Exited")
-                break
-            elif self.user_choice == 'extend':
-                try:
-                    self.seconds = int(input("Enter the number of seconds to sleep: "))
-                    print(f"Sleeping for {self.seconds} seconds...")
-                    time.sleep(self.seconds)
-
-                except ValueError:
-                    print("Please enter a valid integer for seconds.")
-            else:
-                print("Invalid option. Select from the options: 'exit' or 'extend'.")
 
     def Thread(self):
         with open(self.wordlist, 'r') as f:
@@ -123,7 +95,7 @@ class DirectoryBruteforce:
             for line in file:
                 url = line.strip() + '/' + fuzz.strip()
                 try:
-                    response = requests.get(url, timeout=8)
+                    response = requests.get(url, timeout=8, allow_redirects=False)
                     if response.status_code == 200:
                         print(url)
                         with open(f"200_{self.projectname}{n + 1}.txt", "a") as value:
@@ -131,20 +103,23 @@ class DirectoryBruteforce:
                 except requests.exceptions.RequestException as e:
                     pass
 
-
     def Thread2(self):
         x = self.n
 
         while True:
-            with open(f"200_{self.projectname}{self.n}.txt", 'r') as file:
-                y = file.read()
-                if not y:
-                    break
+            try:
+                with open(f"200_{self.projectname}{self.n}.txt", 'r') as file:
+                    y = file.read()
+                    if not y:
+                        break
+            except FileNotFoundError:
+                break
             with open(self.wordlist, 'r') as f:
                 with ThreadPoolExecutor(max_workers=self.Thread_count) as executor:
-                    executor.map(lambda fuzz: self.layer2(fuzz,  x), f)
+                    executor.map(lambda fuzz: self.layer2(fuzz, x), f)
             x += 1
             self.n = x
+
 
 dictionary = DirectoryBruteforce()
 dictionary.url_validations()
