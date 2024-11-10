@@ -43,8 +43,8 @@ class DirectoryBruteforce:
     def Thread_Count_func(self):
         while True:
             try:
-                self.Thread_count = int(input("Enter the Number of Thread Count (between 0 - 9): "))
-                if (self.Thread_count >= 0 and self.Thread_count <= 9):
+                self.Thread_count = int(input("Enter the Number of Thread Count (between 0 - 16): "))
+                if (self.Thread_count >= 0 and self.Thread_count <= 16):
                     break
                 else:
                     print("Invalid Thread Count, it must be between 0 and 9.")
