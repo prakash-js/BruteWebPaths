@@ -66,7 +66,7 @@ class DirectoryBruteforce:
                 print(adding)
                 with open(f"200_{self.projectname}{self.n}.txt", "a") as file:
                     file.write(adding + "\n")
-            elif requesting.status_code == 302 or 301:
+            elif requesting.status_code == 302 or requesting.status_code == 301:
                 print(adding + "  REDIRECTION CODE 302 or 301  ")
                 with open(f"300_{self.projectname}.txt", "a") as file:
                     file.write(adding + "\n")
@@ -118,32 +118,31 @@ class DirectoryBruteforce:
             with ThreadPoolExecutor(max_workers=self.Thread_count) as executor:
                 executor.map(self.attack, f)
 
-    def layer2(self, fuzz):
-        while True:
-            with open(f"200_{self.projectname}{self.n}.txt", 'r') as file:
-                for line in file:
-                    url = line.strip() + '/' + fuzz.strip()
-                    try:
-                        response = requests.get(url, timeout=8)
-                        if response.status_code == 200:
-                            print(url)
-                            with open(f"200_{self.projectname}{self.n + 1}.txt", "a") as value:
-                                value.write(url + "\n")
-                    except requests.exceptions.RequestException as e:
-                        pass
+    def layer2(self, fuzz, n):
+        with open(f"200_{self.projectname}{n}.txt", 'r') as file:
+            for line in file:
+                url = line.strip() + '/' + fuzz.strip()
+                try:
+                    response = requests.get(url, timeout=8)
+                    if response.status_code == 200:
+                        print(url)
+                        with open(f"200_{self.projectname}{n + 1}.txt", "a") as abcd:
+                            abcd.write(url + "\n")
+                except requests.exceptions.RequestException as e:
+                    pass
 
-            with open(f"200_{self.projectname}{self.n}.txt", 'r') as check:
-                content = check.read()
-                if not content:
-                    break
-                self.n += 1
+            
 
 
     def Thread2(self):
         with open(self.wordlist, 'r') as f:
             with ThreadPoolExecutor(max_workers=self.Thread_count) as executor:
-                executor.map(self.layer2, f)
+                executor.map(lambda fuzz: self.layer2(fuzz, self.n), f)
 
+    def Thread3(self):
+        with open(self.wordlist, 'r') as f:
+            with ThreadPoolExecutor(max_workers=self.Thread_count) as executor:
+                executor.map(lambda fuzz: self.layer2(fuzz, self.n + 1), f)
 
 dictionary = DirectoryBruteforce()
 dictionary.url_validations()
@@ -151,3 +150,4 @@ dictionary.validating_wordlist()
 dictionary.Thread_Count_func()
 dictionary.Thread()
 dictionary.Thread2()
+dictionary.Thread3()
