@@ -61,21 +61,16 @@ class DirectoryBruteforce:
                 print(adding)
                 with open(f"200_{self.projectname}{1}.txt", "a") as file:
                     file.write(adding + "\n")
-            elif requesting.status_code == 302:
-                print(adding + "==REDIRECTION CODE(302)==")
-                with open(f"302_{self.projectname}.txt", "a") as file:
+            elif requesting.status_code == 302 or 301:
+                print(adding + "  REDIRECTION CODE 302 or 301  ")
+                with open(f"300_{self.projectname}.txt", "a") as file:
                     file.write(adding + "\n")
-            elif requesting.status_code == 301:
-                print(adding + "  " + "==PERMANENT REDIRECTION CODE(301)==")
-                with open(f"301_{self.projectname}.txt", "a") as file:
-                    file.write(adding + "\n")
-
             elif requesting.status_code == 403:
                 print(adding)
                 with open(f"403_{self.projectname}.txt", "a") as file:
                     file.write(adding + "\n")
             elif requesting.status_code == 500:
-                print(adding + "  " + "==INTERNAL SERVER ERROR CODE(500)==")
+                print(adding)
                 with open(f"500_{self.projectname}.txt", "a") as file:
                     file.write(adding + "\n")
             elif requesting.status_code == 429:
@@ -94,7 +89,7 @@ class DirectoryBruteforce:
         except ConnectionError as e:
             print(f"connection error {e}")
 
-
+    import time
 
     def trail(self):
         while True:
