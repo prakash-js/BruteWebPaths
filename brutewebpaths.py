@@ -127,8 +127,8 @@ class DirectoryBruteforce:
                         response = requests.get(url, timeout=8)
                         if response.status_code == 200:
                             print(url)
-                            with open(f"200_{self.projectname}{self.n + 1}.txt", "a") as abcd:
-                                abcd.write(url + "\n")
+                            with open(f"200_{self.projectname}{self.n + 1}.txt", "a") as value:
+                                value.write(url + "\n")
                     except requests.exceptions.RequestException as e:
                         pass
 
