@@ -5,6 +5,7 @@ from concurrent.futures import ThreadPoolExecutor
 
 
 class DirectoryBruteforce:
+
     def __init__(self):
         self.url = None
         self.wordlist = None
@@ -12,11 +13,13 @@ class DirectoryBruteforce:
         self.Thread_count = None
         self.user_choice = None
         self.seconds = None
+        self.n = 1
+
 
     def url_validations(self):
         while True:
             self.url = str(input("Enter the url to fuzz : "))
-            if self.url[-1] != "/":
+            if self.url[-1] != '/':
                 self.url += '/'
 
             try:
@@ -61,7 +64,7 @@ class DirectoryBruteforce:
         try:
             if requesting.status_code == 200:
                 print(adding)
-                with open(f"200_{self.projectname}{1}.txt", "a") as file:
+                with open(f"200_{self.projectname}{self.n}.txt", "a") as file:
                     file.write(adding + "\n")
             elif requesting.status_code == 302 or 301:
                 print(adding + "  REDIRECTION CODE 302 or 301  ")
@@ -116,19 +119,24 @@ class DirectoryBruteforce:
                 executor.map(self.attack, f)
 
     def layer2(self, fuzz):
-        try:
-            with open(f"200_{self.projectname}{1}.txt", 'r') as file:
+        while True:
+            with open(f"200_{self.projectname}{self.n}.txt", 'r') as file:
                 for line in file:
-                    a = line.strip() + '/' + fuzz.strip()
+                    url = line.strip() + '/' + fuzz.strip()
                     try:
-                        request = requests.get(a, timeout=8)  # Add a timeout to avoid hanging indefinitely
-                        if request.status_code == 200:
-                            print(f"{a}")
+                        response = requests.get(url, timeout=8)
+                        if response.status_code == 200:
+                            print(url)
+                            with open(f"200_{self.projectname}{self.n + 1}.txt", "a") as abcd:
+                                abcd.write(url + "\n")
                     except requests.exceptions.RequestException as e:
-                        # Handle exceptions such as connection errors, timeouts, etc.
-                        print(f"Error with {a}: {e}")
-        except FileNotFoundError:
-            print("file Not found")
+                        pass
+
+            with open(f"200_{self.projectname}{self.n}.txt", 'r') as check:
+                content = check.read()
+                if not content:
+                    break
+                self.n += 1
 
 
     def Thread2(self):
