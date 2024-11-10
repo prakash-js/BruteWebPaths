@@ -52,7 +52,7 @@ class DirectoryBruteforce:
                 if (self.Thread_count >= 0 and self.Thread_count <= 16):
                     break
                 else:
-                    print("Invalid Thread Count, it must be between 0 and 9.")
+                    print("Invalid Thread Count, it must be between 0 and 16.")
 
             except ValueError:
                 print("Invalid input. Please enter an integer.")
