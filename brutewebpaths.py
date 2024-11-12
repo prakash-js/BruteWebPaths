@@ -121,9 +121,9 @@ class DirectoryBruteforce:
             self.n = x
 
 
-dictionary = DirectoryBruteforce()
-dictionary.url_validations()
-dictionary.validating_wordlist()
-dictionary.Thread_Count_func()
-dictionary.Thread()
-dictionary.Thread2()
+bruteforce = DirectoryBruteforce()
+bruteforce.url_validations()
+bruteforce.validating_wordlist()
+bruteforce.Thread_Count_func()
+bruteforce.Thread()
+bruteforce.Thread2()
