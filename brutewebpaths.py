@@ -28,6 +28,7 @@ class DirectoryBruteforce:
             except requests.exceptions.ConnectionError as e:
                 print(f'Invalid URL {e}')
 
+
             except requests.exceptions.InvalidURL as e:
                 print(f'Invalid URL {e}')
 
@@ -64,17 +65,17 @@ class DirectoryBruteforce:
             if requesting.status_code == 200:
                 print(adding)
                 with open(f"200_{self.projectname}{self.n}.txt", "a") as file:
-                    file.write(adding + "\n")
+                    file.write(adding + "\n" )
             elif requesting.status_code == 302 or requesting.status_code == 301:
                 print(adding + "  REDIRECTION CODE 302 or 301  ")
                 with open(f"300_{self.projectname}.txt", "a") as file:
                     file.write(adding + "\n")
             elif requesting.status_code == 403:
-                print(adding)
-                with open(f"403_{self.projectname}{self.m}.txt", "a") as file:
+                print(adding + "   STATUS CODE : 403 ")
+                with open(f"403_{self.projectname}.txt", "a") as file:
                     file.write(adding + "\n")
             elif requesting.status_code == 500:
-                print(adding)
+                print(adding + "   STATUS CODE : 500   " )
                 with open(f"500_{self.projectname}.txt", "a") as file:
                     file.write(adding + "\n")
             elif requesting.status_code == 429:
@@ -86,9 +87,12 @@ class DirectoryBruteforce:
             print(f"connection error {e}")
 
     def Thread(self):
-        with open(self.wordlist, 'r') as f:
-            with ThreadPoolExecutor(max_workers=self.Thread_count) as executor:
-                executor.map(self.attack, f)
+        try:
+            with open(self.wordlist, 'r') as f:
+                with ThreadPoolExecutor(max_workers=self.Thread_count) as executor:
+                    executor.map(self.attack, f)
+        except Exception as e:
+            print(f"Error occur {e} ")
 
     def layer2(self, fuzz, n):
         with open(f"200_{self.projectname}{n}.txt", 'r') as file:
@@ -114,9 +118,12 @@ class DirectoryBruteforce:
                         break
             except FileNotFoundError:
                 break
-            with open(self.wordlist, 'r') as f:
-                with ThreadPoolExecutor(max_workers=self.Thread_count) as executor:
-                    executor.map(lambda fuzz: self.layer2(fuzz, x), f)
+            try:
+                with open(self.wordlist, 'r') as f:
+                    with ThreadPoolExecutor(max_workers=self.Thread_count) as executor:
+                        executor.map(lambda fuzz: self.layer2(fuzz, x), f)
+            except Exception as e:
+                print(f"Error {e}")
             x += 1
             self.n = x
 
