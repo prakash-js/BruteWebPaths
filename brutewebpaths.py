@@ -17,7 +17,7 @@ class DirectoryBruteforce:
 
     def url_validations(self):
         while True:
-            self.url = str(input("Enter the url to fuzz : "))
+            self.url = str(input("Enter the url to fuzz : ")).strip()
             if self.url[-1] != '/':
                 self.url += '/'
 
@@ -70,9 +70,8 @@ class DirectoryBruteforce:
                 print(adding + "  REDIRECTION CODE 302 or 301  ")
                 with open(f"300_{self.projectname}.txt", "a") as file:
                     file.write(adding + "\n")
-            elif requesting.status_code == 403:
-                print(adding + "   STATUS CODE : 403 ")
-                with open(f"403_{self.projectname}.txt", "a") as file:
+            elif requesting.status_code == 403 or requesting.status_code == 401:
+                with open(f"403_{self.projectname}{self.n}.txt", "a") as file:
                     file.write(adding + "\n")
             elif requesting.status_code == 500:
                 print(adding + "   STATUS CODE : 500   " )
@@ -103,6 +102,21 @@ class DirectoryBruteforce:
                     if response.status_code == 200:
                         print(url)
                         with open(f"200_{self.projectname}{n + 1}.txt", "a") as value:
+                            value.write(url + "\n")
+                except requests.exceptions.RequestException as e:
+                    pass
+
+        with open(f"403_{self.projectname}{n}.txt", 'r') as Una_file:
+            for line in Una_file:
+                url = line.strip() + '/' + fuzz.strip()
+                try:
+                    response = requests.get(url, timeout=8, allow_redirects=False)
+                    if response.status_code == 200:
+                        print(url)
+                        with open(f"200_{self.projectname}{n + 1}.txt", "a") as value:
+                            value.write(url + "\n")
+                    elif response.status_code == 403 or response.status_code == 401:
+                        with open(f"403_{self.projectname}{n + 1}.txt", "a") as value:
                             value.write(url + "\n")
                 except requests.exceptions.RequestException as e:
                     pass
