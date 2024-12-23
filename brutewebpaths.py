@@ -93,7 +93,7 @@ class DirectoryBruteforce:
         except Exception as e:
             print(f"Error occur {e} ")
 
-    def layer2(self, fuzz, n):
+    def layer2(self, fuzz, n):       #fuzz=wordlist n=file_count
         with open(f"200_{self.projectname}{n}.txt", 'r') as file:
             for line in file:
                 url = line.strip() + '/' + fuzz.strip()
