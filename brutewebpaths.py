@@ -10,10 +10,11 @@ class DirectoryBruteforce:
         self.url = None
         self.wordlist = None
         self.projectname = None
+        self.cookie = None
         self.Thread_count = None
         self.user_choice = None
         self.seconds = None
-        self.n = 1
+        self.redirection = True  #default = True
 
     def url_validations(self):
         while True:
@@ -25,9 +26,12 @@ class DirectoryBruteforce:
                 response = requests.get(self.url)
                 if response.status_code == 200:
                     break
+                elif response.status_code != 200:
+                    print(f"The Provided url status code is {response.status_code} ")
+                    break
+
             except requests.exceptions.ConnectionError as e:
                 print(f'Invalid URL {e}')
-
 
             except requests.exceptions.InvalidURL as e:
                 print(f'Invalid URL {e}')
@@ -45,11 +49,21 @@ class DirectoryBruteforce:
             else:
                 print("FileNotFound")
 
+    def get_cookie(self):
+        while True:
+            user_choice = str(input("Would you like to add a cookie to the requests (Y/N) : "))
+            if user_choice == 'Y':
+                getting_cookie = str(input("Enter the cookie : "))
+                print(getting_cookie)
+                break
+            elif user_choice == 'N':
+                break
+
     def Thread_Count_func(self):
         while True:
             try:
-                self.Thread_count = int(input("Enter the Number of Thread Count (between 0 - 16): "))
-                if (self.Thread_count >= 0 and self.Thread_count <= 16):
+                self.Thread_count = int(input("Enter the Number of Thread Count (between 1 - 30): "))
+                if (self.Thread_count >= 1 and self.Thread_count <= 30):
                     break
                 else:
                     print("Invalid Thread Count, it must be between 0 and 16.")
@@ -57,33 +71,43 @@ class DirectoryBruteforce:
             except ValueError:
                 print("Invalid input. Please enter an integer.")
 
-    def attack(self, fuzz):
-
-        adding = str(self.url + fuzz.strip())
-        requesting = requests.get(adding, timeout=8, allow_redirects=False)
+    def check_list(self, url):
         try:
-            if requesting.status_code == 200:
-                print(adding)
-                with open(f"200_{self.projectname}{self.n}.txt", "a") as file:
-                    file.write(adding + "\n" )
-            elif requesting.status_code == 302 or requesting.status_code == 301:
-                print(adding + "  REDIRECTION CODE 302 or 301  ")
-                with open(f"300_{self.projectname}.txt", "a") as file:
-                    file.write(adding + "\n")
-            elif requesting.status_code == 403 or requesting.status_code == 401:
-                with open(f"403_{self.projectname}{self.n}.txt", "a") as file:
-                    file.write(adding + "\n")
-            elif requesting.status_code == 500:
-                print(adding + "   STATUS CODE : 500   " )
-                with open(f"500_{self.projectname}.txt", "a") as file:
-                    file.write(adding + "\n")
-            elif requesting.status_code == 429:
-                print("Error 429: Too many requests have been made in a short period of time \n(sleeping for 600Sec.")
+            response = requests.get(url, timeout=8, allow_redirects=self.redirection)
+            if response.history:
+                final_redirected_url = response.url 
+                output = f"{url} was redirected to {final_redirected_url}"
+                print(output)
+                with open(f"redirected_{self.projectname}.txt", "a") as redirected_file:
+                    redirected_file.write(output)
+            elif response.status_code == 200:
+                print(url)
+                with open(f"200_{self.projectname}.txt", "a") as value:
+                    value.write(url + "\n")
+            elif response.status_code == 403 or requesting.status_code == 401:
+                with open(f"403_{self.projectname}.txt", "a") as value:
+                    value.write(url + "\n")
+            elif response.status_code == 406:
+                with open(f"406_{self.projectname}.txt", "a") as value:
+                    value.write(url + "\n")
+            elif response.status_code == 500:
+                print(adding + "   STATUS CODE : 500   ")
+                with open(f"500_{self.projectname}.txt", "a") as value:
+                    value.write(url + "\n")
+            elif response.status_code == 429:
+                print(
+                    "Error 429: Too many requests have been made in a short period of time \n(sleeping for 600Sec.")
                 time.sleep(600)
-            else:
-                pass
-        except ConnectionError as e:
-            print(f"connection error {e}")
+        except requests.exceptions.RequestException as e:
+            pass
+
+        except requests.exceptions.RequestException as e:
+            pass
+
+
+    def attack(self, fuzz):
+        adding = str(self.url + fuzz.strip())
+        self.check_list(adding)            
 
     def Thread(self):
         try:
@@ -92,59 +116,31 @@ class DirectoryBruteforce:
                     executor.map(self.attack, f)
         except Exception as e:
             print(f"Error occur {e} ")
+ 
 
-    def layer2(self, fuzz, n):       #fuzz=wordlist n=file_count
-        with open(f"200_{self.projectname}{n}.txt", 'r') as file:
+
+    def layer2(self, fuzz):
+        with open(f"200_{self.projectname}.txt", 'r') as file:
             for line in file:
-                url = line.strip() + '/' + fuzz.strip()
-                try:
-                    response = requests.get(url, timeout=8, allow_redirects=False)
-                    if response.status_code == 200:
-                        print(url)
-                        with open(f"200_{self.projectname}{n + 1}.txt", "a") as value:
-                            value.write(url + "\n")
-                except requests.exceptions.RequestException as e:
-                    pass
+                adding2 = line.strip() + '/' + fuzz.strip()
+                self.check_list(adding2)
 
-        with open(f"403_{self.projectname}{n}.txt", 'r') as Una_file:
-            for line in Una_file:
-                url = line.strip() + '/' + fuzz.strip()
-                try:
-                    response = requests.get(url, timeout=8, allow_redirects=False)
-                    if response.status_code == 200:
-                        print(url)
-                        with open(f"200_{self.projectname}{n + 1}.txt", "a") as value:
-                            value.write(url + "\n")
-                    elif response.status_code == 403 or response.status_code == 401:
-                        with open(f"403_{self.projectname}{n + 1}.txt", "a") as value:
-                            value.write(url + "\n")
-                except requests.exceptions.RequestException as e:
-                    pass
 
     def Thread2(self):
-        x = self.n
+        try:
+            with open(self.wordlist, 'r') as words:
+                with ThreadPoolExecutor(max_workers=self.Thread_count) as executor:
+                    executor.map(self.layer2, words)
+        except Exception as e:
+            print(f"Error as {e}")
 
-        while True:
-            try:
-                with open(f"200_{self.projectname}{self.n}.txt", 'r') as file:
-                    y = file.read()
-                    if not y:
-                        break
-            except FileNotFoundError:
-                break
-            try:
-                with open(self.wordlist, 'r') as f:
-                    with ThreadPoolExecutor(max_workers=self.Thread_count) as executor:
-                        executor.map(lambda fuzz: self.layer2(fuzz, x), f)
-            except Exception as e:
-                print(f"Error {e}")
-            x += 1
-            self.n = x
 
 
 bruteforce = DirectoryBruteforce()
+#bruteforce.get_cookie() # working on it
 bruteforce.url_validations()
 bruteforce.validating_wordlist()
 bruteforce.Thread_Count_func()
 bruteforce.Thread()
 bruteforce.Thread2()
+ 
