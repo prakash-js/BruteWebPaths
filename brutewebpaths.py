@@ -54,10 +54,23 @@ class DirectoryBruteforce:
             user_choice = str(input("Would you like to add a cookie to the requests (Y/N) : "))
             if user_choice == 'Y':
                 getting_cookie = str(input("Enter the cookie : "))
-                print(getting_cookie)
+                self.working_cookie(getting_cookie)
                 break
             elif user_choice == 'N':
+                self.cookie = None
                 break
+
+    def working_cookie(self, cookie):
+        cookies = {}
+        cookie_split = cookie.split(';')
+        for i in cookie_split:
+            key_cookie, value_cookie = i.strip().split('=')
+            cookies[key_cookie] = value_cookie
+        self.cookie = cookies
+
+        print(self.cookie)
+
+
 
     def Thread_Count_func(self):
         while True:
@@ -106,6 +119,7 @@ class DirectoryBruteforce:
 
 
     def attack(self, fuzz):
+
         adding = str(self.url + fuzz.strip())
         self.check_list(adding)            
 
@@ -122,7 +136,10 @@ class DirectoryBruteforce:
     def layer2(self, fuzz):
         with open(f"200_{self.projectname}.txt", 'r') as file:
             for line in file:
-                adding2 = line.strip() + '/' + fuzz.strip()
+                url2 = line.strip()
+                if url2[-1] != '/':
+                    url2 += '/' 
+                adding2 = url2  + fuzz.strip()
                 self.check_list(adding2)
 
 
@@ -137,7 +154,7 @@ class DirectoryBruteforce:
 
 
 bruteforce = DirectoryBruteforce()
-#bruteforce.get_cookie() # working on it
+bruteforce.get_cookie() 
 bruteforce.url_validations()
 bruteforce.validating_wordlist()
 bruteforce.Thread_Count_func()
