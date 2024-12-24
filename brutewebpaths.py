@@ -41,7 +41,6 @@ class DirectoryBruteforce:
 
         self.projectname = str(input("Enter the project title : ")).strip()
 
-    
     def validating_wordlist(self):
         while True:
             self.wordlist = input("Specify the wordlist : ")
@@ -50,30 +49,16 @@ class DirectoryBruteforce:
             else:
                 print("FileNotFound")
 
-    
     def get_cookie(self):
         while True:
             user_choice = str(input("Would you like to add a cookie to the requests (Y/N) : "))
             if user_choice == 'Y':
                 getting_cookie = str(input("Enter the cookie : "))
-                self.working_cookie(getting_cookie)
+                print(getting_cookie)
                 break
             elif user_choice == 'N':
-                self.cookie = None
                 break
 
-    
-    def working_cookie(self, cookie):
-        cookies = {}
-        cookie_split = cookie.split(';')
-        for i in cookie_split:
-            key_cookie, value_cookie = i.strip().split('=')
-            cookies[key_cookie] = value_cookie
-        self.cookie = cookies
-
-        print(self.cookie)
-
-    
     def Thread_Count_func(self):
         while True:
             try:
@@ -86,7 +71,6 @@ class DirectoryBruteforce:
             except ValueError:
                 print("Invalid input. Please enter an integer.")
 
-    
     def check_list(self, url):
         try:
             response = requests.get(url, timeout=8, allow_redirects=self.redirection)
@@ -125,7 +109,6 @@ class DirectoryBruteforce:
         adding = str(self.url + fuzz.strip())
         self.check_list(adding)            
 
-    
     def Thread(self):
         try:
             with open(self.wordlist, 'r') as f:
@@ -135,16 +118,14 @@ class DirectoryBruteforce:
             print(f"Error occur {e} ")
  
 
+
     def layer2(self, fuzz):
         with open(f"200_{self.projectname}.txt", 'r') as file:
             for line in file:
-                url2 = line.strip()
-                if url2[-1] != '/':
-                    url2 += '/' 
-                adding2 = url2  + fuzz.strip()
+                adding2 = line.strip() + '/' + fuzz.strip()
                 self.check_list(adding2)
 
-    
+
     def Thread2(self):
         try:
             with open(self.wordlist, 'r') as words:
@@ -154,10 +135,11 @@ class DirectoryBruteforce:
             print(f"Error as {e}")
 
 
+
 bruteforce = DirectoryBruteforce()
+#bruteforce.get_cookie() # working on it
 bruteforce.url_validations()
 bruteforce.validating_wordlist()
-bruteforce.get_cookie() 
 bruteforce.Thread_Count_func()
 bruteforce.Thread()
 bruteforce.Thread2()
