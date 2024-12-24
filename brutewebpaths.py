@@ -41,6 +41,7 @@ class DirectoryBruteforce:
 
         self.projectname = str(input("Enter the project title : ")).strip()
 
+    
     def validating_wordlist(self):
         while True:
             self.wordlist = input("Specify the wordlist : ")
@@ -49,6 +50,7 @@ class DirectoryBruteforce:
             else:
                 print("FileNotFound")
 
+    
     def get_cookie(self):
         while True:
             user_choice = str(input("Would you like to add a cookie to the requests (Y/N) : "))
@@ -60,6 +62,7 @@ class DirectoryBruteforce:
                 self.cookie = None
                 break
 
+    
     def working_cookie(self, cookie):
         cookies = {}
         cookie_split = cookie.split(';')
@@ -70,8 +73,7 @@ class DirectoryBruteforce:
 
         print(self.cookie)
 
-
-
+    
     def Thread_Count_func(self):
         while True:
             try:
@@ -84,6 +86,7 @@ class DirectoryBruteforce:
             except ValueError:
                 print("Invalid input. Please enter an integer.")
 
+    
     def check_list(self, url):
         try:
             response = requests.get(url, timeout=8, allow_redirects=self.redirection)
@@ -119,10 +122,10 @@ class DirectoryBruteforce:
 
 
     def attack(self, fuzz):
-
         adding = str(self.url + fuzz.strip())
         self.check_list(adding)            
 
+    
     def Thread(self):
         try:
             with open(self.wordlist, 'r') as f:
@@ -131,7 +134,6 @@ class DirectoryBruteforce:
         except Exception as e:
             print(f"Error occur {e} ")
  
-
 
     def layer2(self, fuzz):
         with open(f"200_{self.projectname}.txt", 'r') as file:
@@ -142,7 +144,7 @@ class DirectoryBruteforce:
                 adding2 = url2  + fuzz.strip()
                 self.check_list(adding2)
 
-
+    
     def Thread2(self):
         try:
             with open(self.wordlist, 'r') as words:
@@ -152,11 +154,10 @@ class DirectoryBruteforce:
             print(f"Error as {e}")
 
 
-
 bruteforce = DirectoryBruteforce()
-bruteforce.get_cookie() 
 bruteforce.url_validations()
 bruteforce.validating_wordlist()
+bruteforce.get_cookie() 
 bruteforce.Thread_Count_func()
 bruteforce.Thread()
 bruteforce.Thread2()
