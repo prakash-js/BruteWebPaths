@@ -49,7 +49,7 @@ class DirectoryBruteforce:
                 print(f'Invalid URL {e}')
         self.domain = self.Extract_domain(self.url)
         self.projectname = str(input(Fore.YELLOW + "Enter the project title : ")).strip()
-
+ 
 
     def validating_wordlist(self):
         while True:
