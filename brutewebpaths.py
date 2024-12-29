@@ -1,12 +1,14 @@
 import os
 import requests
 import time
-import readline
 from concurrent.futures import ThreadPoolExecutor
 from urllib.parse import urlparse
+import readline
+from colorama import init,Fore
 
 
 class DirectoryBruteforce:
+    init(autoreset=True)
 
     def __init__(self):
         self.url = None
@@ -26,7 +28,7 @@ class DirectoryBruteforce:
 
     def url_validations(self):
         while True:
-            self.url = str(input("Enter the url to fuzz : ")).strip()
+            self.url = str(input(Fore.YELLOW + "Enter the url to fuzz : ")).strip()
             if self.url[-1] != '/':
                 self.url += '/'
             try:
@@ -46,12 +48,12 @@ class DirectoryBruteforce:
             except requests.exceptions.MissingSchema as e:
                 print(f'Invalid URL {e}')
         self.domain = self.Extract_domain(self.url)
-        self.projectname = str(input("Enter the project title : ")).strip()
+        self.projectname = str(input(Fore.YELLOW + "Enter the project title : ")).strip()
 
 
     def validating_wordlist(self):
         while True:
-            self.wordlist = input("Specify the wordlist : ")
+            self.wordlist = input(Fore.YELLOW + "Specify the wordlist : ")
             if os.path.exists(self.wordlist):
                 break
             else:
@@ -59,7 +61,7 @@ class DirectoryBruteforce:
 
     def get_cookie(self):
         while True:
-            user_choice = str(input("Would you like to add a cookie to the requests (Y/N) : "))
+            user_choice = str(input(Fore.YELLOW+" Would you like to add a cookie to the requests (Y/N) : "))
             if user_choice == 'Y':
                 getting_cookie = str(input("Enter the cookie : "))
                 print(getting_cookie)
@@ -70,8 +72,8 @@ class DirectoryBruteforce:
     def Thread_Count_func(self):
         while True:
             try:
-                self.Thread_count = int(input("Enter the Number of Thread Count (between 1 - 30): "))
-                if (self.Thread_count >= 1 and self.Thread_count <= 30):
+                self.Thread_count = int(input(Fore.GREEN + "Enter the Number of Thread Count (between 1 - 30): "))
+                if self.Thread_count >= 1 and self.Thread_count <= 30:
                     break
                 else:
                     print("Invalid Thread Count, it must be between 0 and 16.")
@@ -88,7 +90,7 @@ class DirectoryBruteforce:
             response = requests.get(url, timeout=8, allow_redirects=self.redirection, headers=headers)
             if response.history:
                 final_redirected_url = response.url
-                output = f"{url} was redirected to {final_redirected_url}"
+                output = f"{url} " + Fore.YELLOW + f"was redirected to {Fore.GREEN + final_redirected_url}"
                 print(output)
                 domain_out = self.Extract_domain(final_redirected_url)
                 if self.domain == domain_out:
@@ -112,7 +114,7 @@ class DirectoryBruteforce:
                 with open(f"406_{self.projectname}.txt", "a") as value:
                     value.write(url + "\n")
             elif response.status_code == 500:
-                print(url + "   STATUS CODE : 500   ")
+                print(url + Fore.RED + "   STATUS CODE : 500   ")
                 with open(f"500_{self.projectname}.txt", "a") as value:
                     value.write(url + "\n")
             elif response.status_code == 429:
@@ -122,14 +124,12 @@ class DirectoryBruteforce:
         except requests.exceptions.RequestException as e:
             pass
 
-        except requests.exceptions.RequestException as e:
-            pass
-
     def attack(self, fuzz):
         adding = str(self.url + fuzz.strip())
         self.check_list(adding)
 
     def Thread(self):
+        print(Fore.BLUE + "Started ... .. ." )
         try:
             with open(self.wordlist, 'r') as f:
                 with ThreadPoolExecutor(max_workers=self.Thread_count) as executor:
@@ -140,8 +140,13 @@ class DirectoryBruteforce:
     def layer2(self, fuzz):
         with open(f"200_{self.projectname}.txt", 'r') as file:
             for line in file:
+                line = line.strip()
+                if not line or line[-1] != '/':
+                    continue
+
                 adding2 = line.strip() + fuzz.strip()
                 self.check_list(adding2)
+
 
     def Thread2(self):
         try:
@@ -155,7 +160,6 @@ class DirectoryBruteforce:
                         executor.map(self.layer2, words)
         except Exception as e:
             print(f"Error as {e}")
-
 
 bruteforce = DirectoryBruteforce()
 #bruteforce.get_cookie() # working on it
