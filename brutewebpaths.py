@@ -6,8 +6,6 @@ from concurrent.futures import ThreadPoolExecutor
 from urllib.parse import urlparse
 
 
-
-
 class DirectoryBruteforce:
 
     def __init__(self):
