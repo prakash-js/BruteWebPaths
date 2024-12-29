@@ -14,7 +14,7 @@ class DirectoryBruteforce:
         self.Thread_count = None
         self.user_choice = None
         self.seconds = None
-        self.redirection = True  #default = True
+        self.redirection = True  # default = True
 
     def url_validations(self):
         while True:
@@ -72,26 +72,30 @@ class DirectoryBruteforce:
                 print("Invalid input. Please enter an integer.")
 
     def check_list(self, url):
+        headers = {
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
+        }
+
         try:
-            response = requests.get(url, timeout=8, allow_redirects=self.redirection)
+            response = requests.get(url, timeout=8, allow_redirects=self.redirection, headers=headers)
             if response.history:
-                final_redirected_url = response.url 
+                final_redirected_url = response.url
                 output = f"{url} was redirected to {final_redirected_url}"
                 print(output)
                 with open(f"redirected_{self.projectname}.txt", "a") as redirected_file:
                     redirected_file.write(output)
             elif response.status_code == 200:
-                print(response)
+                print(url)
                 with open(f"200_{self.projectname}.txt", "a") as value:
                     value.write(url + "\n")
-            elif response.status_code == 403 or requesting.status_code == 401:
+            elif response.status_code == 403 or response.status_code == 401:
                 with open(f"403_{self.projectname}.txt", "a") as value:
                     value.write(url + "\n")
             elif response.status_code == 406:
                 with open(f"406_{self.projectname}.txt", "a") as value:
                     value.write(url + "\n")
             elif response.status_code == 500:
-                print(adding + "   STATUS CODE : 500   ")
+                print(url + "   STATUS CODE : 500   ")
                 with open(f"500_{self.projectname}.txt", "a") as value:
                     value.write(url + "\n")
             elif response.status_code == 429:
@@ -104,10 +108,9 @@ class DirectoryBruteforce:
         except requests.exceptions.RequestException as e:
             pass
 
-
     def attack(self, fuzz):
         adding = str(self.url + fuzz.strip())
-        self.check_list(adding)            
+        self.check_list(adding)
 
     def Thread(self):
         try:
@@ -116,15 +119,12 @@ class DirectoryBruteforce:
                     executor.map(self.attack, f)
         except Exception as e:
             print(f"Error occur {e} ")
- 
-
 
     def layer2(self, fuzz):
         with open(f"200_{self.projectname}.txt", 'r') as file:
             for line in file:
                 adding2 = line.strip() + '/' + fuzz.strip()
                 self.check_list(adding2)
-
 
     def Thread2(self):
         try:
@@ -135,12 +135,10 @@ class DirectoryBruteforce:
             print(f"Error as {e}")
 
 
-
 bruteforce = DirectoryBruteforce()
-#bruteforce.get_cookie() # working on it
+# bruteforce.get_cookie() # working on it
 bruteforce.url_validations()
 bruteforce.validating_wordlist()
 bruteforce.Thread_Count_func()
 bruteforce.Thread()
 bruteforce.Thread2()
- 
