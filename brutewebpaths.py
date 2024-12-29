@@ -1,6 +1,7 @@
 import os
 import requests
 import time
+import readline
 from concurrent.futures import ThreadPoolExecutor
 from urllib.parse import urlparse
 
@@ -159,7 +160,7 @@ class DirectoryBruteforce:
 
 
 bruteforce = DirectoryBruteforce()
-bruteforce.get_cookie() # working on it
+#bruteforce.get_cookie() # working on it
 bruteforce.url_validations()
 bruteforce.validating_wordlist()
 bruteforce.Thread_Count_func()
