@@ -2,6 +2,9 @@ import os
 import requests
 import time
 from concurrent.futures import ThreadPoolExecutor
+from urllib.parse import urlparse
+
+
 
 
 class DirectoryBruteforce:
@@ -11,17 +14,22 @@ class DirectoryBruteforce:
         self.wordlist = None
         self.projectname = None
         self.cookie = None
+        self.domain = None
         self.Thread_count = None
         self.user_choice = None
         self.seconds = None
         self.redirection = True  # default = True
+        self.list = []
+
+    def Extract_domain(self, domain):
+        parsed_url = urlparse(domain)
+        return parsed_url.netloc
 
     def url_validations(self):
         while True:
             self.url = str(input("Enter the url to fuzz : ")).strip()
             if self.url[-1] != '/':
                 self.url += '/'
-
             try:
                 response = requests.get(self.url)
                 if response.status_code == 200:
@@ -38,8 +46,9 @@ class DirectoryBruteforce:
 
             except requests.exceptions.MissingSchema as e:
                 print(f'Invalid URL {e}')
-
+        self.domain = self.Extract_domain(self.url)
         self.projectname = str(input("Enter the project title : ")).strip()
+
 
     def validating_wordlist(self):
         while True:
@@ -82,8 +91,17 @@ class DirectoryBruteforce:
                 final_redirected_url = response.url
                 output = f"{url} was redirected to {final_redirected_url}"
                 print(output)
-                with open(f"redirected_{self.projectname}.txt", "a") as redirected_file:
-                    redirected_file.write(output)
+                domain_out = self.Extract_domain(final_redirected_url)
+                if self.domain == domain_out:
+                    if final_redirected_url not in self.list:
+                        with open(f"200_{self.projectname}.txt", "a") as value:
+                            value.write(final_redirected_url + "\n")
+                        self.list.append(final_redirected_url)
+                        if len(self.list) > 50:
+                            self.list.pop(0)
+                else:
+                    with open(f"redirected_{self.projectname}.txt", "a") as redirected_file:
+                        redirected_file.write(output)
             elif response.status_code == 200:
                 print(url)
                 with open(f"200_{self.projectname}.txt", "a") as value:
@@ -123,20 +141,25 @@ class DirectoryBruteforce:
     def layer2(self, fuzz):
         with open(f"200_{self.projectname}.txt", 'r') as file:
             for line in file:
-                adding2 = line.strip() + '/' + fuzz.strip()
+                adding2 = line.strip() + fuzz.strip()
                 self.check_list(adding2)
 
     def Thread2(self):
         try:
             with open(self.wordlist, 'r') as words:
-                with ThreadPoolExecutor(max_workers=self.Thread_count) as executor:
-                    executor.map(self.layer2, words)
+                if words == '/':
+                    words = ' '
+                    with ThreadPoolExecutor(max_workers=self.Thread_count) as executor:
+                        executor.map(self.layer2, words)
+                else:
+                    with ThreadPoolExecutor(max_workers=self.Thread_count) as executor:
+                        executor.map(self.layer2, words)
         except Exception as e:
             print(f"Error as {e}")
 
 
 bruteforce = DirectoryBruteforce()
-# bruteforce.get_cookie() # working on it
+bruteforce.get_cookie() # working on it
 bruteforce.url_validations()
 bruteforce.validating_wordlist()
 bruteforce.Thread_Count_func()
