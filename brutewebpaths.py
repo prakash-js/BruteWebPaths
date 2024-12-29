@@ -141,9 +141,11 @@ class DirectoryBruteforce:
         with open(f"200_{self.projectname}.txt", 'r') as file:
             for line in file:
                 line = line.strip()
+                fuzz = fuzz.strip()
                 if not line or line[-1] != '/':
                     continue
-
+                if fuzz == '/':
+                    continue
                 adding2 = line.strip() + fuzz.strip()
                 self.check_list(adding2)
 
@@ -151,15 +153,12 @@ class DirectoryBruteforce:
     def Thread2(self):
         try:
             with open(self.wordlist, 'r') as words:
-                if words == '/':
-                    words = ' '
-                    with ThreadPoolExecutor(max_workers=self.Thread_count) as executor:
-                        executor.map(self.layer2, words)
-                else:
-                    with ThreadPoolExecutor(max_workers=self.Thread_count) as executor:
-                        executor.map(self.layer2, words)
+                with ThreadPoolExecutor(max_workers=self.Thread_count) as executor:
+                    executor.map(self.layer2, words)
+
         except Exception as e:
             print(f"Error as {e}")
+
 
 bruteforce = DirectoryBruteforce()
 #bruteforce.get_cookie() # working on it
