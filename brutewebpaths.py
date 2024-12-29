@@ -81,19 +81,19 @@ class DirectoryBruteforce:
                 with open(f"redirected_{self.projectname}.txt", "a") as redirected_file:
                     redirected_file.write(output)
             elif response.status_code == 200:
-                print(url)
+                print(response)
                 with open(f"200_{self.projectname}.txt", "a") as value:
-                    value.write(url + "\n")
+                    value.write(response + "\n")
             elif response.status_code == 403 or requesting.status_code == 401:
                 with open(f"403_{self.projectname}.txt", "a") as value:
-                    value.write(url + "\n")
+                    value.write(response + "\n")
             elif response.status_code == 406:
                 with open(f"406_{self.projectname}.txt", "a") as value:
-                    value.write(url + "\n")
+                    value.write(response + "\n")
             elif response.status_code == 500:
                 print(adding + "   STATUS CODE : 500   ")
                 with open(f"500_{self.projectname}.txt", "a") as value:
-                    value.write(url + "\n")
+                    value.write(response + "\n")
             elif response.status_code == 429:
                 print(
                     "Error 429: Too many requests have been made in a short period of time \n(sleeping for 600Sec.")
