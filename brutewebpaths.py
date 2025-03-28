@@ -7,6 +7,8 @@ from colorama import init,Fore
 import argparse
 
 
+
+
 class DirectoryBruteforce:
     init(autoreset=True)
 
@@ -16,6 +18,7 @@ class DirectoryBruteforce:
         self.projectname = None
         self.Thread_count = None
         self.user_choice = None
+    #    self.cookie = None
         self.domain = None
         self.seconds = None
         self.n = 1
@@ -30,12 +33,15 @@ class DirectoryBruteforce:
         args.add_argument("--url", type=str, help="Specify a URL.", required=True)
         args.add_argument("--wordlist", type=str, help="Specify the wordlist path",required=True)
         args.add_argument("--output", type=str, help="Specify the output file name",required=True)
+   #     args.add_argument("--cookie", type=str, help="Specify the cookie inside string")
 
         parsed_args = args.parse_args()
 
         self.url = parsed_args.url
         self.wordlist = parsed_args.wordlist
         self.projectname = parsed_args.output
+   #     self.cookie = rf'{parsed_args.cookie}'
+
 
 
     def Extract_domain(self, domain):
@@ -43,37 +49,38 @@ class DirectoryBruteforce:
         return parsed_url.netloc
 
     def url_validations(self):
-        while True:
-            if self.url[-1] != '/':
-                self.url += '/'
+        if self.url[-1] != '/':
+            self.url += '/'
 
-            try:
-                response = requests.get(self.url)
-                if response.status_code == 200:
-                    break
+        try:
+            response = requests.get(self.url)
+            if response.status_code == 200:
                 self.domain = self.Extract_domain(self.url)
-            except requests.exceptions.ConnectionError as e:
-                print(f'Invalid URL {e}')
+        except requests.exceptions.ConnectionError as e:
+            print(f'Invalid URL {e}')
 
 
-            except requests.exceptions.InvalidURL as e:
-                print(f'Invalid URL {e}')
 
-            except requests.exceptions.MissingSchema as e:
-                print(f'Invalid URL {e}')
+        except requests.exceptions.InvalidURL as e:
+            print(f'Invalid URL {e}')
+
+        except requests.exceptions.MissingSchema as e:
+            print(f'Invalid URL {e}')
+
+
 
 
     def validating_wordlist(self):
-        while True:
-            if os.path.exists(self.wordlist):
-                break
-            else:
-                print("FileNotFound")
+
+        if os.path.exists(self.wordlist):
+            pass
+        else:
+            print("FileNotFound")
 
     def Thread_Count_func(self):
         while True:
             try:
-                self.Thread_count = int(input("Enter the Number of Thread Count (between 0 - 16): "))
+                self.Thread_count = int(input("Enter the Number of Thread Count (between 0 - 36): "))
                 if (self.Thread_count >= 0 and self.Thread_count <= 36):
                     break
                 else:
@@ -92,7 +99,7 @@ class DirectoryBruteforce:
             fuzz = fuzz[0:len(fuzz) - 1]
 
         adding = str(self.url + fuzz)
-        requesting = requests.get(adding, timeout=8, allow_redirects=False)
+        requesting = requests.get(adding, timeout=8, allow_redirects=True)
         try:
             if requesting.history:
                 final_redirected_url = requesting.url
@@ -142,7 +149,11 @@ class DirectoryBruteforce:
 
                 url = line.strip() + '/' + fuzz
                 try:
-                    response = requests.get(url, timeout=8,headers = self.header)
+                    if self.cookie is not None:
+                        response = requests.get(url, timeout=8, headers=self.header, cookies=self.cookie)
+
+                    else:
+                        response = requests.get(url, timeout=8,headers = self.header)
 
                     if response.history:
                         final_redirected_url = response.url
