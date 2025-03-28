@@ -6,9 +6,6 @@ from urllib.parse import urlparse
 from colorama import init,Fore
 import argparse
 
-
-
-
 class DirectoryBruteforce:
     init(autoreset=True)
 
@@ -42,8 +39,6 @@ class DirectoryBruteforce:
         self.projectname = parsed_args.output
    #     self.cookie = rf'{parsed_args.cookie}'
 
-
-
     def Extract_domain(self, domain):
         parsed_url = urlparse(domain)
         return parsed_url.netloc
@@ -58,17 +53,12 @@ class DirectoryBruteforce:
                 self.domain = self.Extract_domain(self.url)
         except requests.exceptions.ConnectionError as e:
             print(f'Invalid URL {e}')
-
-
-
+            
         except requests.exceptions.InvalidURL as e:
             print(f'Invalid URL {e}')
 
         except requests.exceptions.MissingSchema as e:
             print(f'Invalid URL {e}')
-
-
-
 
     def validating_wordlist(self):
 
