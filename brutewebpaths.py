@@ -31,7 +31,7 @@ class DirectoryBruteforce:
         args.add_argument("--url", type=str, help="Specify a URL.", required=True)
         args.add_argument("--wordlist", type=str, help="Specify the wordlist path",required=True)
         args.add_argument("--output", type=str, help="Specify the output file name",required=True)
-        args.add_argument("--cookie", type=str, help="Specify the cookie inside string")
+    #    args.add_argument("--cookie", type=str, help="Specify the cookie inside string")
         args.add_argument("--redirection", type=str, help="Specify whether redirection should be True or False (default is True)")
         args.add_argument("--thread", type=int, help="Specify the thread count (maximum 36, default is 7)")
 
@@ -110,8 +110,6 @@ class DirectoryBruteforce:
         fuzz = fuzz.strip()
         if fuzz == '/':
             return
-        if '.' not in fuzz[1:]:
-            fuzz += '/'
         if fuzz.endswith('/'):
             fuzz = fuzz.rstrip('/')
 
@@ -164,8 +162,6 @@ class DirectoryBruteforce:
                 fuzz = fuzz.strip()
                 if fuzz == '/':
                     return
-                if '.' not in fuzz[1:]:
-                    fuzz += '/'
                 if fuzz.endswith('/'):
                     fuzz = fuzz.rstrip('/')
 
