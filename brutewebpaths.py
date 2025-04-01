@@ -13,10 +13,11 @@ class DirectoryBruteforce:
         self.url = None
         self.wordlist = None
         self.projectname = None
-        self.Thread_count = None
+        self.Thread_count = 7
         self.user_choice = None
-    #    self.cookie = None
+        self.cookie = None
         self.domain = None
+        self.redirection = True
         self.seconds = None
         self.n = 1
         self.header = {
@@ -26,18 +27,56 @@ class DirectoryBruteforce:
 
 
     def arguments(self):
-        args = argparse.ArgumentParser()
+        args = argparse.ArgumentParser(description="Directory Brute-Force Tool")
         args.add_argument("--url", type=str, help="Specify a URL.", required=True)
         args.add_argument("--wordlist", type=str, help="Specify the wordlist path",required=True)
         args.add_argument("--output", type=str, help="Specify the output file name",required=True)
-   #     args.add_argument("--cookie", type=str, help="Specify the cookie inside string")
+        args.add_argument("--cookie", type=str, help="Specify the cookie inside string")
+        args.add_argument("--redirection", type=str, help="Specify whether redirection should be True or False (default is True)")
+        args.add_argument("--thread", type=int, help="Specify the thread count (maximum 36, default is 7)")
+
 
         parsed_args = args.parse_args()
 
         self.url = parsed_args.url
         self.wordlist = parsed_args.wordlist
         self.projectname = parsed_args.output
-   #     self.cookie = rf'{parsed_args.cookie}'
+        self.cookie = parsed_args.cookie
+        self.redirection = parsed_args.redirection
+        self.Thread_count = parsed_args.thread
+
+        if self.redirection:
+            variable = self.redirection.lower()
+            if variable == "true":
+                self.redirection = True
+            elif variable == "false":
+                self.redirection = False
+            else:
+                print("Specify redirection as either True or False")
+                exit()
+
+        if self.Thread_count:
+
+            try:
+                if (self.Thread_count >= 0 and self.Thread_count <= 36):
+                    pass
+
+                else:
+                    print("Invalid Thread Count, it must be between 0 and 36.")
+                    exit()
+
+            except ValueError:
+                print("Invalid input. Please enter an integer.")
+
+        if self.cookie:
+            try:
+                key, value = self.cookie.split('=')
+                self.cookie = {key: value}
+            except ValueError:
+                print("Invalid cookie format. Use key=value format.")
+                return
+            exit()
+
 
     def Extract_domain(self, domain):
         parsed_url = urlparse(domain)
@@ -53,7 +92,7 @@ class DirectoryBruteforce:
                 self.domain = self.Extract_domain(self.url)
         except requests.exceptions.ConnectionError as e:
             print(f'Invalid URL {e}')
-            
+
         except requests.exceptions.InvalidURL as e:
             print(f'Invalid URL {e}')
 
@@ -67,39 +106,32 @@ class DirectoryBruteforce:
         else:
             print("FileNotFound")
 
-    def Thread_Count_func(self):
-        while True:
-            try:
-                self.Thread_count = int(input("Enter the Number of Thread Count (between 0 - 36): "))
-                if (self.Thread_count >= 0 and self.Thread_count <= 36):
-                    break
-                else:
-                    print("Invalid Thread Count, it must be between 0 and 16.")
-
-            except ValueError:
-                print("Invalid input. Please enter an integer.")
-
     def attack(self, fuzz):
         fuzz = fuzz.strip()
         if fuzz == '/':
-            return 0
-        if '.' not in fuzz[1::]:
-            fuzz = fuzz + '/'
-        if '.' in fuzz[::-1] and fuzz[-1] == '/':
-            fuzz = fuzz[0:len(fuzz) - 1]
+            return
+        if '.' not in fuzz[1:]:
+            fuzz += '/'
+        if fuzz.endswith('/'):
+            fuzz = fuzz.rstrip('/')
 
         adding = str(self.url + fuzz)
-        requesting = requests.get(adding, timeout=8, allow_redirects=True)
+
+        if self.cookie is None:
+            requesting = requests.get(adding, timeout=8, allow_redirects=True)
+        if self.cookie is not None:
+            requesting = requests.get(adding, timeout=8, allow_redirects=True, cookies=self.cookie)
         try:
             if requesting.history:
                 final_redirected_url = requesting.url
                 output = f"{adding} " + Fore.YELLOW + f"was redirected to {Fore.GREEN + final_redirected_url}"
                 print(output)
+                print(final_redirected_url)
                 domain_out = self.Extract_domain(final_redirected_url)
                 if self.domain == domain_out:
                     with open(f"200_{self.projectname}{self.n}.txt", "a") as file:
-                        file.write(adding + "\n")
-            if requesting.status_code == 200:
+                        file.write(final_redirected_url + "\n")
+            elif requesting.status_code == 200:
                 print(adding)
                 with open(f"200_{self.projectname}{self.n}.txt", "a") as file:
                     file.write(adding + "\n" )
@@ -107,11 +139,11 @@ class DirectoryBruteforce:
                 with open(f"403_{self.projectname}{self.n}.txt", "a") as file:
                     file.write(adding + "\n")
             elif requesting.status_code == 500:
-                print(adding + "   STATUS CODE : 500   " )
+                print(adding + Fore.RED +"   STATUS CODE : 500   " )
                 with open(f"500_{self.projectname}.txt", "a") as file:
                     file.write(adding + "\n")
             elif requesting.status_code == 429:
-                print("Error 429: Too many requests have been made in a short period of time \n(sleeping for 600Sec.")
+                print(Fore.RED + "Error 429: Too many requests have been made in a short period of time \n(sleeping for 600Sec.")
                 time.sleep(600)
             else:
                 pass
@@ -131,35 +163,42 @@ class DirectoryBruteforce:
             for line in file:
                 fuzz = fuzz.strip()
                 if fuzz == '/':
-                    return 0
-                if '.' not in fuzz[1::]:
-                    fuzz = fuzz + '/'
-                if '.' in fuzz[::-1] and fuzz[-1] == '/':
-                    fuzz = fuzz[0:len(fuzz) - 1]
+                    return
+                if '.' not in fuzz[1:]:
+                    fuzz += '/'
+                if fuzz.endswith('/'):
+                    fuzz = fuzz.rstrip('/')
 
-                url = line.strip() + '/' + fuzz
+                url = line.strip()  + fuzz
                 try:
-                    if self.cookie is not None:
-                        response = requests.get(url, timeout=8, headers=self.header, cookies=self.cookie)
+                    if self.cookie is None:
+                        response = requests.get(url, timeout=8, headers=self.header)
 
-                    else:
-                        response = requests.get(url, timeout=8,headers = self.header)
+                    if self.cookie is not None:
+                        response = requests.get(url, timeout=8,headers = self.header, cookies=self.cookie)
 
                     if response.history:
                         final_redirected_url = response.url
                         output = f"{url} " + Fore.YELLOW + f"was redirected to {Fore.GREEN + final_redirected_url}"
                         print(output)
+                        print(final_redirected_url)
                         domain_out = self.Extract_domain(final_redirected_url)
                         if self.domain == domain_out:
                             with open(f"200_{self.projectname}{n + 1}.txt", "a") as value:
-                                value.write(url + "\n")
-                    if response.status_code == 200:
+                                value.write(final_redirected_url + "\n")
+                    elif response.status_code == 200:
                         print(url)
                         with open(f"200_{self.projectname}{n + 1}.txt", "a") as value:
                             value.write(url + "\n")
+                    elif response.status_code == 403 or response.status_code == 401:
+                        with open(f"403_{self.projectname}{self.n+1}.txt", "a") as value:
+                            value.write(url + "\n")
+                    elif response.status_code == 500:
+                        print(url + Fore.RED + "   STATUS CODE : 500   ")
+                        with open(f"500_{self.projectname}{self.n+1}.txt", "a") as value:
+                            value.write(url + "\n")
                 except requests.exceptions.RequestException as e:
                     pass
-
 
     def Thread2(self):
         x = self.n
@@ -185,8 +224,6 @@ class DirectoryBruteforce:
 bruteforce = DirectoryBruteforce()
 bruteforce.url_validations()
 bruteforce.validating_wordlist()
-bruteforce.Thread_Count_func()
 bruteforce.Thread()
-#bruteforce.get_cookie() # working on it
 bruteforce.Thread2()
 
