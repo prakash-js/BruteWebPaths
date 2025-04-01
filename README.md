@@ -7,5 +7,5 @@ BruteWebPaths  is a simple and effective Python-based tool designed to perform d
 
 `pip install -r requirement.txt`
 
-`python3 brutewebpaths.py`
+`python3 brutewebpaths.py --help `
 
