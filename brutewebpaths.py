@@ -30,11 +30,9 @@ class DirectoryBruteforce:
         args = argparse.ArgumentParser(description="Directory Brute-Force Tool")
         args.add_argument("--url", type=str, help="Specify a URL.", required=True)
         args.add_argument("--wordlist", type=str, help="Specify the wordlist path", required=True)
-        args.add_argument("--output", type=str, help="Specify the output folder name (unique name is preferred)",
-                          required=True)
+        args.add_argument("--output", type=str, help="Specify the unique output folder name ",required=True)
         args.add_argument("--cookie", type=str, help="Specify the cookie inside string")
-        args.add_argument("--redirection", type=str,
-                          help="Specify whether redirection should be True or False (default is True)")
+        args.add_argument("--redirection", type=str,help="Specify whether redirection should be True or False (default is True)")
         args.add_argument("--thread", type=int, help="Specify the thread count (maximum 36, default is 7)")
 
         parsed_args = args.parse_args()
