@@ -30,9 +30,11 @@ class DirectoryBruteforce:
         args = argparse.ArgumentParser(description="Directory Brute-Force Tool")
         args.add_argument("--url", type=str, help="Specify a URL.", required=True)
         args.add_argument("--wordlist", type=str, help="Specify the wordlist path", required=True)
-        args.add_argument("--output", type=str, help="Specify the unique output folder name",required=True)
-        args.add_argument("--cookie", type=str, help="Specify the cookie inside string /'<cookie>/' ")
-        args.add_argument("--redirection", type=str,help="Specify whether redirection should be True or False (default is True)")
+        args.add_argument("--output", type=str, help="Specify the output folder name (unique name is preferred)",
+                          required=True)
+        args.add_argument("--cookie", type=str, help="Specify the cookie inside string")
+        args.add_argument("--redirection", type=str,
+                          help="Specify whether redirection should be True or False (default is True)")
         args.add_argument("--thread", type=int, help="Specify the thread count (maximum 36, default is 7)")
 
         parsed_args = args.parse_args()
@@ -132,7 +134,7 @@ class DirectoryBruteforce:
             for trail in [fuzz, fuzz + '/']:
                 adding = str(self.url + trail)
         elif '.' in fuzz[1:]:
-            adding = str(self.url + fuzz + '/')
+            adding = str(self.url + fuzz)
         else:
             adding = str(self.url + fuzz + '/')
 
@@ -199,7 +201,7 @@ class DirectoryBruteforce:
                     for trail in [fuzz, fuzz + '/']:
                         url = str(line.strip() + trail)
                 elif '.' in fuzz[1:]:
-                    url = str(line.strip() + fuzz + '/')
+                    url = str(line.strip() + fuzz)
                 else:
                     url = str(line.strip() + fuzz + '/')
                 try:
