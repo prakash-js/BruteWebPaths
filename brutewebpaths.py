@@ -30,8 +30,8 @@ class DirectoryBruteforce:
         args = argparse.ArgumentParser(description="Directory Brute-Force Tool")
         args.add_argument("--url", type=str, help="Specify a URL.", required=True)
         args.add_argument("--wordlist", type=str, help="Specify the wordlist path",required=True)
-        args.add_argument("--output", type=str, help="Specify the output file name",required=True)
-    #    args.add_argument("--cookie", type=str, help="Specify the cookie inside string")
+        args.add_argument("--output", type=str, help="Specify the output file name (unique name is preferred)",required=True)
+        args.add_argument("--cookie", type=str, help="Specify the cookie inside string")
         args.add_argument("--redirection", type=str, help="Specify whether redirection should be True or False (default is True)")
         args.add_argument("--thread", type=int, help="Specify the thread count (maximum 36, default is 7)")
 
@@ -41,7 +41,7 @@ class DirectoryBruteforce:
         self.url = parsed_args.url
         self.wordlist = parsed_args.wordlist
         self.projectname = parsed_args.output
-        #self.cookie = parsed_args.cookie
+        self.cookie = parsed_args.cookie
         self.redirection = parsed_args.redirection
         self.Thread_count = parsed_args.thread
 
@@ -70,12 +70,20 @@ class DirectoryBruteforce:
 
         if self.cookie:
             try:
-                key, value = self.cookie.split('=')
-                self.cookie = {key: value}
+                parts = self.cookie.split(';')
+                cookie = {}
+                for part in parts:
+                    if '=' in part:
+                        key, value = part.split('=', 1)
+                        cookie[key] = value
+                    else:
+                        cookie[part] = True
+                self.cookie = cookie
+                print(self.cookie)
+
             except ValueError:
                 print("Invalid cookie format. Use key=value format.")
                 return
-            exit()
 
 
     def Extract_domain(self, domain):
@@ -112,8 +120,16 @@ class DirectoryBruteforce:
             return
         if fuzz.endswith('/'):
             fuzz = fuzz.rstrip('/')
+        else:
+            pass
 
-        adding = str(self.url + fuzz)
+        if fuzz.startswith('.'):
+            for trail in [fuzz, fuzz + '/']:
+                adding = str(self.url + fuzz)
+        elif '.' in fuzz[1:]:
+            adding = str(self.url + fuzz + '/')
+        else:
+            adding = str(self.url + fuzz+'/')
 
         if self.cookie is None:
             requesting = requests.get(adding, timeout=8, allow_redirects=True)
@@ -157,15 +173,15 @@ class DirectoryBruteforce:
             print(f"Error occur {e} ")
 
     def layer2(self, fuzz, n):       #fuzz=wordlist n=file_count
-        with open(f"200_{self.projectname}{n}.txt", 'r') as file:
-            for line in file:
+        with open(f"200_{self.projectname}{n}.txt", 'r') as file:           #opening saved urls
+            for urls in file:
                 fuzz = fuzz.strip()
                 if fuzz == '/':
                     return
                 if fuzz.endswith('/'):
                     fuzz = fuzz.rstrip('/')
 
-                url = line.strip()  + fuzz
+                url = urls.strip() + fuzz
                 try:
                     if self.cookie is None:
                         response = requests.get(url, timeout=8, headers=self.header)
@@ -222,4 +238,3 @@ bruteforce.url_validations()
 bruteforce.validating_wordlist()
 bruteforce.Thread()
 bruteforce.Thread2()
-
