@@ -41,7 +41,7 @@ class DirectoryBruteforce:
         self.url = parsed_args.url
         self.wordlist = parsed_args.wordlist
         self.projectname = parsed_args.output
-        self.cookie = parsed_args.cookie
+        #self.cookie = parsed_args.cookie
         self.redirection = parsed_args.redirection
         self.Thread_count = parsed_args.thread
 
