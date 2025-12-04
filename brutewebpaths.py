@@ -160,6 +160,7 @@ class DirectoryBruteforce:
                 with open(os.path.join(self.projectname, f"200_{self.projectname}{self.n}.txt"), "a") as file:
                     file.write(adding + "\n")
             elif requesting.status_code == 403 or requesting.status_code == 401:
+                print(adding + Fore.RED + " ==> 403/401(Unauthorized/Forbidden)")
                 with open(os.path.join(self.projectname, f"403_{self.projectname}{self.n}.txt"), "a") as file:
                     file.write(adding + "\n")
             elif requesting.status_code == 500:
@@ -230,6 +231,7 @@ class DirectoryBruteforce:
                         with open(os.path.join(self.projectname, f"200_{self.projectname}{n + 1}.txt"), "a") as value:
                             value.write(url + "\n")
                     elif response.status_code == 403 or response.status_code == 401:
+                        print(adding + Fore.RED + " ==> 403/401(Unauthorized/Forbidden)")
                         with open(os.path.join(self.projectname, f"403_{self.projectname}{self.n + 1}.txt"),
                                   "a") as value:
                             value.write(url + "\n")
